@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from rest_framework import response
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Student
-from .serializers import StudentSerializer
+from .serializers import StudentSerializer , UserSerializer
 
 
 
@@ -49,6 +51,24 @@ def student_delete(request , pk):
     instance.delete()
 
     return Response("student deleted")    
+
+
+
+@api_view(["POST"])
+def registration_view(request):
+    if request.method == "POST" :
+        data={}
+        serializer=UserSerializer(data=request.data)
+        if serializer.is_valid() :
+            user = serializer.save()
+            data["massage"]="Register is done"
+            tokenkey = Token.objects.get(user = user).key
+            data['token']= tokenkey
+        return Response(data)    
+
+
+
+
 
 
 
